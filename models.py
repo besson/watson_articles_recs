@@ -9,3 +9,9 @@ class Neighbor:
 
     def __lt__(self, other):
         return self.score < other.score
+
+    def to_dict(self):
+        return {
+            'user_id': self.user_id,
+            'score': self.score,
+        }
