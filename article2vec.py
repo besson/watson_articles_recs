@@ -10,45 +10,69 @@ class Article2vec():
     """
     
     def __init__(self, epochs=100, vec_size=20, alpha=0.025):
-        self.model = None
         self.epochs = epochs
         self.vec_size = vec_size
         self.alpha = alpha
 
+        self.model =  Doc2Vec(size=self.vec_size,
+                            alpha=self.alpha, 
+                            min_alpha=0.00025,
+                            min_count=1,
+                            dm=1)
+
     def fit(self, X):
+        """
+        Train dot2vec model with provided data
+        INPUT
+            X - (pd.DataFrame) with training data
+        OUTPUT
+            self : (object) Article2vec object
+        """
         tagged_data = []
 
         for idx, row in X.iterrows():
             tagged_data.append(TaggedDocument(words=word_tokenize(row['doc_full_name'].lower()), tags=[str(row['article_id'])]))
 
-        model = Doc2Vec(size=self.vec_size,
-                            alpha=self.alpha, 
-                            min_alpha=0.00025,
-                            min_count=1,
-                            dm=1)
-                            
-        model.build_vocab(tagged_data)
+        self.model.build_vocab(tagged_data)
 
         for epoch in range(self.epochs):
             print('epoch {0}'.format(epoch))
+            self.model.train(tagged_data, total_examples=self.model.corpus_count, epochs=self.model.iter)
 
-            model.train(tagged_data, total_examples=model.corpus_count, epochs=model.iter)
+            # Decrease the learning rate
+            self.model.alpha -= 0.0002
 
-            # decrease the learning rate
-            model.alpha -= 0.0002
-
-            # fix the learning rate, no decay
-            model.min_alpha = model.alpha
-
-        self.model = model
+            # Fix the learning rate, no decay
+            self.model.min_alpha = self.model.alpha
 
         return self
 
     def save(self, name='article2v.model'):
+        """
+        Save model into disk
+        INPUT
+            name - (str) model file name
+        OUTPUT
+           None
+        """
         self.model.save(name)
     
     def load(self, name='article2v.model'):
+        """
+        Load model from disk
+        INPUT
+            name - (str) model file name
+        OUTPUT
+           None
+        """
         self.model = Doc2Vec.load(name)
 
     def recommend(self, article_id):
+        """
+        Find similar articles to the provided article id
+        INPUT
+            article_id - (str) article id
+        OUTPUT
+           None
+        """
         return self.model.docvecs.most_similar(article_id)
