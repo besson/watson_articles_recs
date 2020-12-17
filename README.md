@@ -3,7 +3,7 @@
 Generating different type of recommendations of IBM Watson articles. This project is part of a Nanodegree in Data Science at [Udacity](https://www.udacity.com/) and it is structured as follows:
 
 * **reports/**: It contains the main notebook (main deliverable) in the Markdow file which is easier to read than *.ipynb* format
-* **data**: Sample data for generating recommemndations
+* **data/**: Sample data for generating recommemndations
 * **Recommendations_with_IBM.ipynb**: Notebook to explore and generate the recommendations
 * **models.py**: Object models used to represent recommendations
 * **article2vec.py**: Doc2vec Gensin model to generate content-based article recommendations
